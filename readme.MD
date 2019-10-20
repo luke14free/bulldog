@@ -7,7 +7,7 @@ The guardian dog that prevents you from writing poor code.
 Bulldog is a library for writing better code in your analysis that largely borrows from the state management libraries for application development (Redux, Flux, Vuex, Katana..).
 
 Bulldog models are composed of three main building blocks:
-1) `data`, which the nothing but the data required by our is not directly modifiable
+1) `data`, which is our model initial data
 2) `data_modifiers`, which are special function whose main task is to modify the model's data
 3) `business_logic`, which are function whose main task is to execute the business logic and invoke `data_modifiers`
 4) `analyses`, which subscribe to change on the model's `data`
