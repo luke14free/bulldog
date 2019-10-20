@@ -47,7 +47,7 @@ def analysis3(data, history):
 
 def main():
     model.dispatch('action1')
-    model.commit('data_step')
+    model.commit('data_step', factor=9)
     print(model.history.keys())
     model.revert_version(Version(name='action1', step=1))
     # or equivalently `model.rollback(2)`
