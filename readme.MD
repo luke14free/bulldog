@@ -4,7 +4,7 @@ The guardian dog that prevents you from writing poor code.
 
 ## Philosophy
 
-Bulldog is a library for writing better code in your analysis that largely borrows from the state management libraries for application development (Redux, Flux, Vuex, Katana..).
+Bulldog is a library for writing better code in your analysis that largely borrows from the state management libraries for application development ([Redux](https://github.com/reduxjs/redux), [Flux](https://github.com/facebook/flux), [Vuex](https://github.com/vuejs/vuex), [Katana](https://github.com/BendingSpoons/katana-swift)..).
 
 Bulldog models are composed of three main building blocks:
 1) `data`, which the nothing but the data required by our is not directly modifiable
