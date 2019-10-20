@@ -93,7 +93,7 @@ def analysis(data, history):
     print('fast 1', list(history.keys())[-1].name, pd.np.mean(df.values))
 ```
 
-Analyses are function with signature `function(data, history)` that are run automatically every time a checkpoint step of our model is executed.
+Analyses are functions with signature `function(data, history)` that are run automatically every time a checkpoint step of our model is executed.
 Optionally analyses can be run in parallel (if you use the `@model.parallelizable` decorator, as above). This is particularly convenient
 in case we are computing a large number of metrics and want to leverage our CPU as much as possible.
 Note that only analyses can be parallelized in Bulldog.
