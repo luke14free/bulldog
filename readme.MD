@@ -4,9 +4,9 @@ The guardian dog that prevents you from writing poor code.
 
 ## Philosophy
 
-Bulldog is a library for writing better code in your analysis that largely borrows from the state management libraries for application development (Redux, Flux, Vuex, Katana..).
+Bulldog is a library for writing better code in your analysis that largely borrows from the state management libraries for application development ([Redux](https://github.com/reduxjs/redux), [Flux](https://github.com/facebook/flux), [Vuex](https://github.com/vuejs/vuex), [Katana](https://github.com/BendingSpoons/katana-swift)..).
 
-Bulldog models are composed of three main building blocks:
+Bulldog models are composed of five main building blocks:
 1) `data`, which is our model initial data
 2) `data_modifiers`, which are special function whose main task is to modify the model's data
 3) `business_logic`, which are function whose main task is to execute the business logic and invoke `data_modifiers`
@@ -93,7 +93,7 @@ def analysis(data, history):
     print('fast 1', list(history.keys())[-1].name, pd.np.mean(df.values))
 ```
 
-Analyses are function with signature `function(data, history)` that are run automatically every time a checkpoint step of our model is executed.
+Analyses are functions with signature `function(data, history)` that are run automatically every time a checkpoint step of our model is executed.
 Optionally analyses can be run in parallel (if you use the `@model.parallelizable` decorator, as above). This is particularly convenient
 in case we are computing a large number of metrics and want to leverage our CPU as much as possible.
 Note that only analyses can be parallelized in Bulldog.
