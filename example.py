@@ -1,10 +1,15 @@
 from bulldog import Model, Version
 import pandas as pd
 import time
+import pickle
 
-model = Model({
-    'df': pd.DataFrame(pd.np.ones((100, 100)))
-})
+model = Model(
+    data={
+        'df': pd.DataFrame(pd.np.ones((100, 100))),
+    },
+    on_checkpoint_save=lambda data, key, history: pickle.dump(data, open('data_{}.pkl'.format(key.step), 'wb')),
+    on_checkpoint_restore=lambda key, history: pickle.load(open('data_{}.pkl'.format(key.step), 'rb'))
+)
 
 
 @model.data_modifier

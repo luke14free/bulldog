@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Callable, List, Any, Dict
+from typing import Callable, List, Any, Dict, Union
 from pathos.multiprocessing import ProcessingPool as Pool
 
 from copy import deepcopy
@@ -46,7 +46,9 @@ Version = namedtuple('Version', 'step name')
 
 
 class Model:
-    def __init__(self, data: Dict, max_pool_size=0, unique_bl_steps=True) -> None:
+    def __init__(self, data: Dict, max_pool_size=0, unique_bl_steps=True,
+                 on_checkpoint_save: Union[None, Callable] = None,
+                 on_checkpoint_restore: Union[None, Callable] = None) -> None:
         self._data = data
         self.checkpoints = []
         self.data_modifiers = {}
@@ -56,6 +58,8 @@ class Model:
         self._history = OrderedDict({})
         self.unique_bl_steps = unique_bl_steps
         self.pool = Pool(max_pool_size or cpu_count())
+        self.on_checkpoint_save = on_checkpoint_save
+        self.on_checkpoint_restore = on_checkpoint_restore
 
     @property
     def data(self) -> Dict:
@@ -126,7 +130,8 @@ class Model:
             raise DataModifierNotFound(DATA_MODIFIER_NOT_FOUND.format(data_modifier_name))
         if data_modifier_name in self.checkpoints:
             self.run_analyses()
-            self._history[version_key] = self.data
+            self._history[version_key] = self.data if not self.on_checkpoint_save else self.on_checkpoint_save(
+                self.data, self.history)
         return self._data
 
     def dispatch(self, business_logic_name: str, *args: List, **kwargs: Dict) -> Any:
@@ -142,7 +147,8 @@ class Model:
         version_key = Version(step=len(self._history), name=business_logic_name)
         if business_logic_name in self.checkpoints:
             self.run_analyses()
-            self._history[version_key] = self.data
+            self._history[version_key] = self.data if not self.on_checkpoint_save else self.on_checkpoint_save(
+                self.data, version_key, self.history)
         else:
             self._history[version_key] = None
         return output
@@ -160,21 +166,15 @@ class Model:
         return func
 
     def revert_version(self, version_key: Version) -> None:
-        prev_value = self._history[version_key]
+        prev_value = self._history[version_key] if not self.on_checkpoint_restore else self.on_checkpoint_restore(
+            version_key, self._history)
         if not prev_value:
             raise NoCheckpointAvailableForKey(version_key)
-        self._data = self._history[version_key]
+        self._data = prev_value
         for key in self.history.keys():
             if key.step > version_key.step:
                 del self._history[key]
 
     def rollback(self, number_of_steps: int = 1) -> None:
-        key = list(self._history.keys())[-(number_of_steps + 1)]
-        prev_value = self._history[key]
-        if not prev_value:
-            raise NoCheckpointAvailableForKey(key)
-        self._data = prev_value
-        if list(self._history.keys())[-1].name in self.checkpoints:
-            self.run_analyses()
-        for key in list(self._history.keys())[-number_of_steps:]:
-            del self._history[key]
+        version_key = list(self._history.keys())[-(number_of_steps + 1)]
+        self.revert_version(version_key)

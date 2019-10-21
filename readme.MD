@@ -98,6 +98,22 @@ Optionally analyses can be run in parallel (if you use the `@model.parallelizabl
 in case we are computing a large number of metrics and want to leverage our CPU as much as possible.
 Note that only analyses can be parallelized in Bulldog.
 
+### Custom checkpoints management
+
+If you are working with large/custom data and you don't want to save the whole history in memory, you can rely on two functions
+that will allow you to create custom save/load logic at every checkpoint. These function are called:
+
+1) `on_checkpoint_save(data, version_key, history)`: this function is responsible for saving the `data` (or a diff of it which you can compute by comparing it with your model `history`, holding every other checkpoint data)
+2) `on_checkpoint_restore(version_key, history)`: this function is responsible for restoring data from a previous checkpoint
+
+Bulldog doesn't implement any custom diffing logic for the data object (since it's a generic dictionary which could contain anything),
+but you can provide your own functions to checkpoint & restore your data. For example you might want to write/read:
+
+1) from a database
+2) from a pickled file on disk
+3) from h5df
+3) diffs from custom diffing tools (or generic ones like [csv-diff](https://github.com/aswinkarthik/csvdiff))
+
 ### Advanced usage
 
 Bulldog has a few nice features for people that use interactive editors (like `ipython` or `jupyter notebook`).
