@@ -1,6 +1,12 @@
 # Bulldog
 
-The guardian dog that prevents you from writing poor code.
+The guardian dog that prevents you from writing poor code when doing data analysis in Python.
+
+## Installation
+
+Simply run:
+
+`pip install bulldog`
 
 ## Philosophy
 
@@ -20,7 +26,7 @@ clarity, testing and debugging easier to achieve.
 
 To create a bulldog model simply run:
 ```python
-from bulldog import Model
+from bulldog.model import Model
 import pandas as pd
 
 model = Model(data={

@@ -1,4 +1,4 @@
-from bulldog import Model, Version
+from bulldog.bulldog import Model, Version
 import pandas as pd
 import time
 import pickle

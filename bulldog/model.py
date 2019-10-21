@@ -6,6 +6,8 @@ from copy import deepcopy
 from collections import OrderedDict, namedtuple
 from multiprocessing import cpu_count
 
+version = "1.0.1"
+
 FROZEN_ERROR = "model data is readonly. It can only be modified with a data_modifier"
 DATA_MODIFIER_NOT_CALLABLE_ERROR = "data_modifier(s) should be committed, not called directly"
 BUSINESS_LOGIC_NOT_CALLABLE_ERROR = "business_logic(s) should be dispatched, not called directly"
