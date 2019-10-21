@@ -100,19 +100,41 @@ Note that only analyses can be parallelized in Bulldog.
 
 ### Custom checkpoints management
 
-If you are working with large/custom data and you don't want to save the whole history in memory, you can rely on two functions
-that will allow you to create custom save/load logic at every checkpoint. These function are called:
-
-1) `on_checkpoint_save(data, version_key, history)`: this function is responsible for saving the `data` (or a diff of it which you can compute by comparing it with your model `history`, holding every other checkpoint data)
-2) `on_checkpoint_restore(version_key, history)`: this function is responsible for restoring data from a previous checkpoint
-
-Bulldog doesn't implement any custom diffing logic for the data object (since it's a generic dictionary which could contain anything),
+Out of the box, Bulldog doesn't implement any custom diffing logic for the model `data` (since it's a generic dictionary which could contain anything),
 but you can provide your own functions to checkpoint & restore your data. For example you might want to write/read:
 
 1) from a database
 2) from a pickled file on disk
 3) from h5df
 3) diffs from custom diffing tools (or generic ones like [csv-diff](https://github.com/aswinkarthik/csvdiff))
+
+If you want to provide some custom save/load logic to handle checkpoint save & restore, pass these two functions to the Model initializer:
+
+1) `on_checkpoint_save(data, version_key, history)`: this function is responsible for saving the `data` (or a diff of it which you can compute by comparing it with your model `history`, holding every other checkpoint data)
+2) `on_checkpoint_restore(version_key, history)`: this function is responsible for restoring data from a previous checkpoint
+
+For example if you want to read from disk pickled objects you might do:
+
+```python
+def on_checkpoint_save(data, key, history):
+    file_name = 'data_{}.pkl'.format(key.step)
+    pickle.dump(data, open('data_{}.pkl'.format(key.step), 'wb'))
+    return file_name  # only the file name will be saved in memory
+
+
+def on_checkpoint_restore(key, history):
+    file_name = history[key]
+    return pickle.load(open(file_name, 'rb'))  # store this in model.data
+
+
+model = Model(
+    data={
+        'df': pd.DataFrame(pd.np.ones((100, 100))),
+    },
+    on_checkpoint_save=on_checkpoint_save,
+    on_checkpoint_restore=on_checkpoint_restore
+)
+```
 
 ### Advanced usage
 

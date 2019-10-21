@@ -3,12 +3,24 @@ import pandas as pd
 import time
 import pickle
 
+
+def on_checkpoint_save(data, key, history):
+    file_name = 'data_{}.pkl'.format(key.step)
+    pickle.dump(data, open('data_{}.pkl'.format(key.step), 'wb'))
+    return file_name  # only the file name will be saved in memory
+
+
+def on_checkpoint_restore(key, history):
+    file_name = history[key]
+    return pickle.load(open(file_name, 'rb'))  # store this in model.data
+
+
 model = Model(
     data={
         'df': pd.DataFrame(pd.np.ones((100, 100))),
     },
-    on_checkpoint_save=lambda data, key, history: pickle.dump(data, open('data_{}.pkl'.format(key.step), 'wb')),
-    on_checkpoint_restore=lambda key, history: pickle.load(open('data_{}.pkl'.format(key.step), 'rb'))
+    on_checkpoint_save=on_checkpoint_save,
+    on_checkpoint_restore=on_checkpoint_restore
 )
 
 
